@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <title>Meeting Details</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, #000428, #004e92);
+            color: #ffffff;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 50px;
+            color: #343a40;
+        }
+
+        h1 {
+            color: darkgreen;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        th {
+            background-color: white;
+            color: #343a40;
+        }
+
+        tbody tr:hover {
+            background-color: #f2f2f2;
+        }
+    </style>
+
+    <script>
+        function noBack() {
+            if (window.performance && window.performance.navigation.type === 2) {
+                window.location.replace("Error.html");
+            }
+        }
+        window.onload = function () {
+            noBack();
+        };
+    </script>
+</head>
+
+<body onload="noBack();" onunload="">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">
+            <img src="logo1.png" width="30" height="30" class="d-inline-block align-top" alt="">
+            CMS
+        </a>
+        <ul class="navbar-nav ms-auto flex-row">
+            <li class="nav-item ms-3">
+                <a href="/logout">
+                    <button type="button" class="btn btn-outline-success">Log out</button>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Meeting Details -->
+    <div class="container col-md-8">
+        <h1>My Meetings</h1>
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Meeting Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="m : ${ma}">
+                    <td th:text="${m.appt}"></td>
+                    <td th:text="${m.time}"></td>
+                    <td>
+                        <a th:href="${m.meetingLink}" target="_blank" style="color: #004e92; text-decoration: none;">
+                            <span th:text="${m.meetingLink}"></span>
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(ma)}">
+                    <td colspan="3" class="text-center text-muted">No meetings scheduled yet.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

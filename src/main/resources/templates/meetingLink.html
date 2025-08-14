@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Meeting Link Scheduling</title>
+	<style>
+		body {
+			font-family: 'Arial', sans-serif;
+			background-color: #f4f4f4;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			min-height: 100vh;
+		}
+
+		.container {
+			max-width: 400px;
+			background: #fff;
+			padding: 30px;
+			border-radius: 10px;
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+		}
+
+		h2 {
+			text-align: center;
+			color: #3498db;
+		}
+
+		form {
+			display: flex;
+			flex-direction: column;
+		}
+
+		label {
+			margin-bottom: 8px;
+			color: #333;
+		}
+
+		input[type="text"],
+		input[type="date"],
+		select,
+		input[type="submit"] {
+			width: 100%;
+			padding: 12px;
+			margin: 8px 0;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 16px;
+		}
+
+		input[type="submit"] {
+			background-color: #3498db;
+			color: white;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
+
+		input[type="submit"]:hover {
+			background-color: #2980b9;
+		}
+	</style>
+</head>
+
+<body onload="noBack();">
+
+	<div class="container">
+		<h2>Meeting Link Scheduling</h2>
+		<form th:action="@{/addMeeting}" method="post" onsubmit="return validateForm()">
+
+			<label for="appt">Preferred Date</label>
+			<input type="date" id="appt" name="appt" onchange="loadTimeSlots()" required>
+
+			<label for="time">Preferred Time</label>
+			<select id="time" name="time" required>
+				<option value="" disabled selected>Select a time slot</option>
+			</select>
+
+			<label for="meeting">Meeting Link</label>
+			<input type="text" id="meeting" name="meetingLink" placeholder="https://..." required>
+
+			<input type="submit" value="Submit">
+		</form>
+	</div>
+
+	<script>
+		const timeSlots = {
+			1: ["9:30 AM - 10:30 AM", "11:00 AM - 12:00 PM"], // Monday
+			2: ["11:30 AM - 12:30 PM"], // Tuesday
+			3: ["1:30 PM - 2:30 PM"], // Wednesday
+			4: ["3:00 PM - 4:00 PM"], // Thursday
+			5: ["4:15 PM - 5:15 PM"]  // Friday
+		};
+
+		function loadTimeSlots() {
+			const selectedDate = new Date(document.getElementById('appt').value);
+			const today = new Date();
+			const tomorrow = new Date();
+			tomorrow.setDate(today.getDate() + 1);
+
+			if (selectedDate < tomorrow) {
+				alert('Please select a date from tomorrow onwards.');
+				document.getElementById('appt').value = '';
+				return;
+			}
+
+			const dayOfWeek = selectedDate.getDay();
+
+			if (dayOfWeek === 0 || dayOfWeek === 6) {
+				alert('Sorry, Saturdays & Sundays are not available.');
+				document.getElementById('appt').value = '';
+				return;
+			}
+
+			const timeSelect = document.getElementById('time');
+			timeSelect.innerHTML = '<option value="" disabled selected>Select a time slot</option>';
+
+			const slots = timeSlots[dayOfWeek] || [];
+			for (const slot of slots) {
+				const option = document.createElement('option');
+				option.text = slot;
+				timeSelect.add(option);
+			}
+
+			// Optional: Fetch already booked slots from backend and disable them
+			/*
+			fetch(`/api/booked-slots?date=${document.getElementById('appt').value}`)
+				.then(res => res.json())
+				.then(booked => {
+					Array.from(timeSelect.options).forEach(opt => {
+						if (booked.includes(opt.text)) {
+							opt.disabled = true;
+							opt.text += " (Booked)";
+						}
+					});
+				});
+			*/
+		}
+
+		function validateForm() {
+			const meetingLink = document.getElementById('meeting').value;
+			if (!meetingLink.startsWith("http")) {
+				alert("Please enter a valid meeting link starting with http/https.");
+				return false;
+			}
+			return true;
+		}
+
+		function noBack() {
+			if (window.performance && window.performance.navigation.type === 2) {
+				window.location.replace("Error.html");
+			}
+		}
+	</script>
+
+</body>
+</html>
